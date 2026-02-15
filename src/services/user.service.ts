@@ -1,29 +1,59 @@
 import bcrypt from 'bcryptjs';
+import type { User } from '@prisma/client';
 import prisma from '../config/database.js';
 import { ApiError } from '../utils/apiError.js';
 
 const SALT_ROUNDS = 10;
 
-// Fields to exclude from responses
-const sanitizeUser = (user) => {
-  const { password, ...sanitized } = user;
+type SafeUser = Omit<User, 'password'>;
+
+interface CreateUserData {
+  email: string;
+  username: string;
+  password: string;
+  fullName?: string;
+}
+
+interface UpdateUserData {
+  email?: string;
+  username?: string;
+  fullName?: string;
+  role?: 'ADMIN' | 'USER';
+  isActive?: boolean;
+}
+
+interface PaginatedResult {
+  data: SafeUser[];
+  total: number;
+}
+
+const sanitizeUser = (user: User): SafeUser => {
+  const { password: _, ...sanitized } = user;
   return sanitized;
 };
 
-export const create = async (data) => {
-  // Check if email already exists
+const userSelect = {
+  id: true,
+  email: true,
+  username: true,
+  fullName: true,
+  role: true,
+  isActive: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
+export const create = async (data: CreateUserData): Promise<SafeUser> => {
   const existingEmail = await prisma.user.findUnique({ where: { email: data.email } });
   if (existingEmail) {
     throw new ApiError(409, 'Email already exists');
   }
 
-  // Check if username already exists
   const existingUsername = await prisma.user.findUnique({ where: { username: data.username } });
   if (existingUsername) {
     throw new ApiError(409, 'Username already exists');
   }
 
-  // Hash password
   const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
 
   const user = await prisma.user.create({
@@ -36,7 +66,7 @@ export const create = async (data) => {
   return sanitizeUser(user);
 };
 
-export const getAll = async (page = 1, limit = 10) => {
+export const getAll = async (page = 1, limit = 10): Promise<PaginatedResult> => {
   const skip = (page - 1) * limit;
 
   const [data, total] = await Promise.all([
@@ -44,16 +74,7 @@ export const getAll = async (page = 1, limit = 10) => {
       skip,
       take: limit,
       orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        fullName: true,
-        role: true,
-        isActive: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: userSelect,
     }),
     prisma.user.count(),
   ]);
@@ -61,19 +82,10 @@ export const getAll = async (page = 1, limit = 10) => {
   return { data, total };
 };
 
-export const getById = async (id) => {
+export const getById = async (id: number): Promise<SafeUser> => {
   const user = await prisma.user.findUnique({
     where: { id },
-    select: {
-      id: true,
-      email: true,
-      username: true,
-      fullName: true,
-      role: true,
-      isActive: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+    select: userSelect,
   });
 
   if (!user) {
@@ -83,13 +95,12 @@ export const getById = async (id) => {
   return user;
 };
 
-export const update = async (id, data) => {
+export const update = async (id: number, data: UpdateUserData): Promise<SafeUser> => {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) {
     throw new ApiError(404, 'User not found');
   }
 
-  // Check email uniqueness if updating
   if (data.email && data.email !== user.email) {
     const existing = await prisma.user.findUnique({ where: { email: data.email } });
     if (existing) {
@@ -97,7 +108,6 @@ export const update = async (id, data) => {
     }
   }
 
-  // Check username uniqueness if updating
   if (data.username && data.username !== user.username) {
     const existing = await prisma.user.findUnique({ where: { username: data.username } });
     if (existing) {
@@ -113,7 +123,7 @@ export const update = async (id, data) => {
   return sanitizeUser(updatedUser);
 };
 
-export const remove = async (id) => {
+export const remove = async (id: number): Promise<void> => {
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) {
     throw new ApiError(404, 'User not found');

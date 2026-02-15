@@ -1,6 +1,34 @@
-const config = {
+interface AppConfig {
+  port: number;
+  env: string;
+  version: string;
+}
+
+interface DbConfig {
+  url: string;
+}
+
+interface JwtConfig {
+  secret: string;
+  expiresIn: string;
+  refreshSecret: string;
+  refreshExpiresIn: string;
+}
+
+interface CorsConfig {
+  origin: string;
+}
+
+export interface Config {
+  app: AppConfig;
+  db: DbConfig;
+  jwt: JwtConfig;
+  cors: CorsConfig;
+}
+
+const config: Config = {
   app: {
-    port: process.env.PORT || 3000,
+    port: Number(process.env.PORT) || 3000,
     env: process.env.NODE_ENV || 'development',
     version: process.env.APP_VERSION || '1.0.0',
   },

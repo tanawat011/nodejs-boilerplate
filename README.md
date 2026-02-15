@@ -2,8 +2,9 @@
 
 # 🚀 Node.js Boilerplate
 
-**A production-ready RESTful API boilerplate built with Node.js, Express, Prisma, and MySQL.**
+**A production-ready RESTful API boilerplate built with TypeScript, Express, Prisma, and MySQL.**
 
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-4.18-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 [![Prisma](https://img.shields.io/badge/Prisma-5.7-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
@@ -11,7 +12,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-*Kickstart your next Node.js API project with battle-tested patterns and best practices.*
+*Kickstart your next Node.js API project with TypeScript, battle-tested patterns and best practices.*
 
 </div>
 
@@ -21,6 +22,7 @@
 
 | Feature | Description |
 |---------|-------------|
+| 💎 **TypeScript** | Full type safety with strict mode enabled |
 | 🏗️ **Layered Architecture** | Controller → Service → Prisma (clean separation of concerns) |
 | 🔐 **JWT Authentication** | Token-based auth with role-based access control (ADMIN / USER) |
 | 📦 **Prisma ORM** | Type-safe database client with migrations and auto-generation |
@@ -28,8 +30,8 @@
 | 📝 **Winston Logging** | Structured logging with console + file transports |
 | 🛡️ **Security** | Helmet, CORS, rate limiting out of the box |
 | 🔄 **Graceful Shutdown** | Handles SIGTERM/SIGINT for zero-downtime deployments |
-| 🐳 **Docker Ready** | Dockerfile + Docker Compose (App + MySQL) |
-| ⚡ **ES Modules** | Native ESM (no Babel needed) |
+| 🐳 **Docker Ready** | Multi-stage Dockerfile + Docker Compose (App + MySQL) |
+| ⚡ **ES Modules** | Native ESM with TypeScript |
 | 🧪 **Test Ready** | Jest + Supertest pre-configured |
 
 ---
@@ -42,30 +44,31 @@ nodejs-boilerplate/
 │   └── schema.prisma            # Database schema & models
 ├── src/
 │   ├── config/
-│   │   ├── database.js          # Prisma client instance
-│   │   ├── index.js             # Configuration management
-│   │   └── logger.js            # Winston logger setup
+│   │   ├── database.ts          # Prisma client instance
+│   │   ├── index.ts             # Configuration management
+│   │   └── logger.ts            # Winston logger setup
 │   ├── controllers/
-│   │   └── user.controller.js   # HTTP request handlers
+│   │   └── user.controller.ts   # HTTP request handlers
 │   ├── middlewares/
-│   │   ├── auth.js              # JWT authentication & authorization
-│   │   ├── errorHandler.js      # Global error handler
-│   │   └── validate.js          # Joi validation middleware
+│   │   ├── auth.ts              # JWT authentication & authorization
+│   │   ├── errorHandler.ts      # Global error handler
+│   │   └── validate.ts          # Joi validation middleware
 │   ├── routes/
-│   │   ├── index.js             # Route aggregator
-│   │   └── user.routes.js       # User CRUD routes
+│   │   ├── index.ts             # Route aggregator
+│   │   └── user.routes.ts       # User CRUD routes
 │   ├── services/
-│   │   └── user.service.js      # Business logic layer
+│   │   └── user.service.ts      # Business logic layer
 │   ├── utils/
-│   │   ├── apiError.js          # Custom error class
-│   │   ├── catchAsync.js        # Async error wrapper
-│   │   └── response.js          # Standardized responses
+│   │   ├── apiError.ts          # Custom error class
+│   │   ├── catchAsync.ts        # Async error wrapper
+│   │   └── response.ts          # Standardized responses
 │   ├── validations/
-│   │   └── user.validation.js   # Joi schemas
-│   └── index.js                 # Application entry point
+│   │   └── user.validation.ts   # Joi schemas
+│   └── index.ts                 # Application entry point
 ├── .env.example
 ├── docker-compose.yml
 ├── Dockerfile
+├── tsconfig.json
 ├── package.json
 └── README.md
 ```
@@ -83,8 +86,8 @@ nodejs-boilerplate/
 ### Quick Start with Docker
 
 ```bash
-git clone https://github.com/tanawat011/Boilerplate-nodejs-mysql.git
-cd Boilerplate-nodejs-mysql
+git clone https://github.com/tanawat011/nodejs-boilerplate.git
+cd nodejs-boilerplate
 
 # Start all services
 docker-compose up -d
@@ -96,8 +99,8 @@ docker-compose up -d
 
 ```bash
 # Clone and navigate
-git clone https://github.com/tanawat011/Boilerplate-nodejs-mysql.git
-cd Boilerplate-nodejs-mysql
+git clone https://github.com/tanawat011/nodejs-boilerplate.git
+cd nodejs-boilerplate
 
 # Copy environment file
 cp .env.example .env
@@ -111,7 +114,7 @@ npx prisma generate
 # Run database migrations
 npx prisma migrate dev
 
-# Start development server
+# Start development server (with hot-reload)
 npm run dev
 ```
 
@@ -165,8 +168,10 @@ curl "http://localhost:3000/api/v1/users?page=1&limit=10"
 ## 🛠️ Available Scripts
 
 ```bash
-npm run dev           # Start with hot-reload (nodemon)
+npm run dev           # Start with hot-reload (tsx watch)
+npm run build         # Compile TypeScript to JavaScript
 npm start             # Start production server
+npm run typecheck     # Run TypeScript type checking
 npm test              # Run tests with coverage
 npm run lint          # Run ESLint
 npm run prisma:studio # Open Prisma Studio (DB GUI)
@@ -180,6 +185,7 @@ npm run docker:down   # Stop Docker services
 
 | Technology | Purpose |
 |-----------|---------|
+| [TypeScript](https://www.typescriptlang.org/) | Language |
 | [Express](https://expressjs.com/) | HTTP framework |
 | [Prisma](https://www.prisma.io/) | Database ORM |
 | [MySQL](https://www.mysql.com/) | Database |
@@ -199,7 +205,7 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 <div align="center">
 
-**Built with ❤️ and Node.js**
+**Built with ❤️ and TypeScript**
 
 *If you found this helpful, give it a ⭐️!*
 
